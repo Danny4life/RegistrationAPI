@@ -3,10 +3,12 @@ package com.osiki.springsecuritydemoone.service;
 import com.osiki.springsecuritydemoone.entity.PasswordResetToken;
 import com.osiki.springsecuritydemoone.entity.User;
 import com.osiki.springsecuritydemoone.entity.VerificationToken;
+import com.osiki.springsecuritydemoone.model.LoginModel;
 import com.osiki.springsecuritydemoone.model.UserModel;
 import com.osiki.springsecuritydemoone.repository.PasswordResetTokenRepository;
 import com.osiki.springsecuritydemoone.repository.UserRepository;
 import com.osiki.springsecuritydemoone.repository.VerificationTokenRepository;
+import com.osiki.springsecuritydemoone.response.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -144,5 +146,33 @@ public class UserServiceImpl implements UserService{
     @Override
     public boolean checkIfValidOldPassword(User user, String oldPassword) {
         return passwordEncoder.matches(oldPassword, user.getPassword());
+    }
+
+    @Override
+    public LoginResponse loginUser(LoginModel loginModel) {
+
+        String msg = "";
+        User user1 = userRepository.findByEmail(loginModel.getEmail());
+
+        if(user1 != null){
+            String password = loginModel.getPassword();
+            String encodedPassword = user1.getPassword();
+            Boolean isPwdRight = passwordEncoder.matches(password, encodedPassword);
+
+            if(isPwdRight){
+                Optional<User> user = userRepository.findOneByEmailAndPassword(loginModel.getEmail(), encodedPassword);
+
+                if(user.isPresent()){
+                    return new LoginResponse("Login successful", true);
+                } else {
+                    return new LoginResponse("Login failed", false);
+                }
+            }else {
+                return new LoginResponse("Email or password not match", false);
+            }
+        }else {
+            return new LoginResponse("Email does not exist", false);
+        }
+
     }
 }

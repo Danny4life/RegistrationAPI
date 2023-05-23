@@ -3,12 +3,15 @@ package com.osiki.springsecuritydemoone.controller;
 import com.osiki.springsecuritydemoone.entity.User;
 import com.osiki.springsecuritydemoone.entity.VerificationToken;
 import com.osiki.springsecuritydemoone.event.RegistrationCompleteEvent;
+import com.osiki.springsecuritydemoone.model.LoginModel;
 import com.osiki.springsecuritydemoone.model.PasswordModel;
 import com.osiki.springsecuritydemoone.model.UserModel;
+import com.osiki.springsecuritydemoone.response.LoginResponse;
 import com.osiki.springsecuritydemoone.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +40,16 @@ public class RegistrationController {
         ));
 
         return "Success";
+
+    }
+
+    @PostMapping("/login")
+
+    public ResponseEntity<?> loginUser(@RequestBody LoginModel loginModel){
+
+        LoginResponse loginResponse = userService.loginUser(loginModel);
+
+        return ResponseEntity.ok(loginResponse);
 
     }
 
